@@ -1,25 +1,27 @@
-from utils import load_operation, number_card
-import re
+from utils import load_operation, number_output, transaction, transaction_from
 
 
 def main():
     operations = load_operation()
     for operation in operations:
-        operation_date = operation["date"].strftime("%d.%m.%Y")
-        operations_name_to = re.sub("[^a-zA-ZА-Яа-я\s]", "", operation["to"])
-        operations_number_to = re.sub("[\D]", "", operation["to"])
-        operations_output_to = number_card(operations_name_to, operations_number_to)
+        transfer = transaction(operation)
         if "from" in operation:
-            operations_name_card = re.sub("[^a-zA-ZА-Яа-я\s]", "", operation["from"])
-            operations_number_card = re.sub("[\D]", "", operation["from"])
-            card_output = number_card(operations_name_card, operations_number_card)
-            print(f"{operation_date}, {operation["description"]}\n"
-                  f"{operations_name_card}{card_output}->{operations_name_to}{operations_output_to}\n"
-                  f"{operation["operationAmount"]["amount"]} {operation["operationAmount"]["currency"]["name"]}\n")
+            transfer_from = transaction_from(operation["from"])
+
+            if "Счет " == transfer_from.card_name():
+                print(f"{transfer.date}, {operation["description"]}\n"
+                      f"{transfer_from.card_name()}{transfer_from.account_number()}->{transfer.name_to()}{transfer.account_number()}\n"
+                      f"{transfer.amount} {transfer.name}\n")
+            else:
+                card_output = number_output(transfer_from.card_number())
+                print(f"{transfer.date}, {operation["description"]}\n"
+                      f"{transfer_from.card_name()}{card_output}->{transfer.name_to()}{transfer.account_number()}\n"
+                      f"{transfer.amount} {transfer.name}\n")
+
         else:
-            print(f"{operation_date}, {operation["description"]}\n"
-                  f"{operations_name_to}{operations_output_to}\n"
-                  f"{operation["operationAmount"]["amount"]} {operation["operationAmount"]["currency"]["name"]}\n")
+            print(f"{transfer.date}, {operation["description"]}\n"
+                  f"{transfer.name_to()}{transfer.account_number()}\n"
+                  f"{transfer.amount} {transfer.name}\n")
 
 
 if __name__ == '__main__':
