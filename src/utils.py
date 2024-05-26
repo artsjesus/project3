@@ -3,6 +3,7 @@ from dateutil import parser
 
 
 def load_operation():
+    """Создание списка операций"""
     operations = []
     with open("operations.json", "r", encoding="UTF-8") as file:
         operation_list = [operation for operation in json.load(file) if operation and operation["state"] == "EXECUTED"]
