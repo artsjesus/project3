@@ -13,6 +13,3 @@ def load_operation():
         operation["date"] = parser.parse(operation["date"]).date()
         operations.append(operation)
     return operations
-
-
-
